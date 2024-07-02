@@ -32,13 +32,13 @@ The American Type Culture Collection ([ATCC](https://www.atcc.org/)) sells a wid
 - Information about how each strain was collected (meta, catalogue)
 - Structural/functional information about genome assemblies (annotation).
 
+<br /> <br />
+
 ATCCfinder contains two core functionalities that may be used in conjunction or independently:
  1. Download ATCC references (with a valid API key)
  2. Query refernce sequences and report alignment results. The tool was built primarily for usage with ATCC refernce genomes, but custom sequence databases may also be searched against.
 
 Once the ATCC reference genome database is retrieved by ATCCfinder, queries may be compared against ATCC reference genomes using the sequence alignment tool minimap2, whose results are then parsed to produce summary data describing what ATCC-available species and strain, if any, the query sequence matches.
-
-
 
 
 
