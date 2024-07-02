@@ -1,5 +1,7 @@
 # ATCCfinder
 
+**Developed at Los Alamos National Laboratory (O# O4644)**
+
 Download [ATCC Genome Portal](https://genomes.atcc.org/) microbial reference genomes and align query sequences.
 
 
