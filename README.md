@@ -27,12 +27,18 @@ Download [ATCC Genome Portal](https://genomes.atcc.org/) microbial reference gen
 
 # About <a name="About"></a>
 
-The American Type Culture Collection (ATCC) sells a wide variety of microbes with strain-level taxonomy classification and associated sequenced reference genomes. Currently, ATCC does not provide a method for searching for sequence similarity between a query sequence and their database of reference genomes. ATCCfinder utilizes ATCC application interface software (API) to generate query-able databases from ATCC Genome resources. This tool provides the ability to generate databases of the four ATCC data types:
+The American Type Culture Collection ([ATCC](https://www.atcc.org/)) sells a wide variety of microbes with strain-level taxonomy classification and associated sequenced reference genomes. ATCCfinder utilizes ATCC application interface software (API) to generate query-able databases from ATCC Genome resources. This tool provides the ability to generate databases of the four ATCC data types:
 - Strain-specific genome assembly sequence data (reference)
 - Information about how each strain was collected (meta, catalogue)
 - Structural/functional information about genome assemblies (annotation).
 
-Once the ATCC sequence database is retrieved by ATCCfinder, queries may be compared against ATCC reference genomes using the sequence alignment tool minimap2, whose results are then parsed to produce summary data describing what ATCC-available species and strain, if any, the query sequence matches.
+ATCCfinder contains two core functionalities that may be used in conjunction or independently:
+ 1. Download ATCC references (with a valid API key)
+ 2. Query refernce sequences and report alignment results. The tool was built primarily for usage with ATCC refernce genomes, but custom sequence databases may also be searched against.
+
+Once the ATCC reference genome database is retrieved by ATCCfinder, queries may be compared against ATCC reference genomes using the sequence alignment tool minimap2, whose results are then parsed to produce summary data describing what ATCC-available species and strain, if any, the query sequence matches.
+
+
 
 
 
