@@ -121,7 +121,9 @@ mamba install r-base r-argparse
 | --- | --- |
 | --query | Query Sequence(s) fasta file |
 | --target | Target database fasta file |
-| --nhits | The maximum number of target hits to return per query|
+| --target_meta | Required if using a custom target database. Provides meta data associated with sequences in a standardized format. Must contain columns 'header_id', 'reference_id', and 'taxonomy'. Additional columns may be included. |
+| --nhits | The maximum number of target hits to return per query |
+| note_nmatch_p | (0-100) Specify an alignment nmatch percentage at or above which results will be noted as potential matches despite their aggregate score not being the maximum. |
 | --overwrite | (T/F) If alignment output already exists, should it be overwritten? |
 | --outdir | Output directory |
 
