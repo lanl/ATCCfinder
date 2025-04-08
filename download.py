@@ -1,6 +1,15 @@
 #!/usr/bin/env python3
 
 ## ___________________________________________________________________________
+## Packages
+
+import os
+
+
+
+
+
+## ___________________________________________________________________________
 ## Functions, General
 
 def argparse():
@@ -23,10 +32,14 @@ def argparse():
     parser.add_argument(
         "--download", help = "Specify which / any ATCC databases to download.",
         required = False, default = False, nargs = "*" )
+    
+    parser.add_argument(
+        "--atcc_ids", help = "If provided, only downloads references associated with the specified ATCC ids. Input should be a newline-seperated .txt file.",
+        required = False, default = "")
 
     parser.add_argument(
         "--overwrite", help="If downloading databases, specifies whether or not downloads in output folder should be kept or replaced.",
-        required = False, default = True, action = argparse.BooleanOptionalAction)
+        required = False, default = False, action = argparse.BooleanOptionalAction)
 
     parser.add_argument(
         "--format", help="",
@@ -152,7 +165,7 @@ def export_gz(path, string):
     ## Packages
     import gzip
     ## Main
-    with gzip.open(path, 'wb') as outfile:
+    with gzip.open(path, 'ab') as outfile:
         outfile.write(string.encode())
 
 def test_if_fasta(file):
@@ -189,6 +202,23 @@ def test_if_fasta(file):
                         is_fasta = True
 
     return(is_fasta)
+
+def load_atcc_ids(dir):
+    """
+    README: Load a newline-delimited textfile specifying ATCC genome ids to download.
+    """
+
+    ## Initialize list for storing ids
+    ids = []
+
+    ## Parse ids
+    with open(dir) as infile:
+        for id in infile:
+            id_clean = id.strip()
+            if id_clean != "":
+                ids.append(id_clean)
+            
+    return(ids)
 
 
 
@@ -465,8 +495,8 @@ def ATCC_download_assembly(ids, api_key, dir_out, overwrite):
 
     ## [Packages]
     import genome_portal_api
+    import glob
     import os
-    import time
 
     ## [Paths] Define and create output directory & file
     print("\nDownloading ATCC assembly database:")
@@ -504,37 +534,22 @@ def ATCC_download_assembly(ids, api_key, dir_out, overwrite):
             print(
                 "____________________________________________________________"
                 "\n"   + "Downloading ATCC assembly:"+
-                "\n\t" + "> attempt "  + str(attempt) + " / " + str(max_attempts)+
+                "\n\t" + "> attempt "  + str(attempt) + " / " + str(max_attempts+1)+
                 "\n\t" + "> ATCC ID: " + id +
-                "\n" )
-
+                "\n"   )
+            
             ## Download genome
-            time.sleep(.25)
             fasta = genome_portal_api.download_assembly(
                 api_key            = api_key,
                 id                 = id,
                 download_link_only = "False",
                 download_assembly  = "True" )
 
-            ## Write genome to file 
-            for key in fasta:
-                export_gz( path = dir_out, string = key + "\n" + fasta[key] )
-
-            ## Test if download successful
-            if test_if_fasta(file=dir_out):
-                print("\n\t" + "> Download successful.")
+            ## Write genome to file
+            if "<Error><Code>" not in "".join( fasta.keys() ):
+                for key in fasta:
+                    export_gz( path = dir_out, string = key + "\n" + fasta[key] + "\n" )
                 downloading = False
-
-            ## If the dowload was not successful...
-            else:
-                ## If this was the final attempt, stop trying to download and move on to next assembly
-                if attempt > max_attempts:
-                    print("\n\t" + "> Download failed after " + str(max_attempts) + " attempts, moving on to next genome")
-                    ## write to fail file
-                    downloading = False
-                ## If this was not the last attempt, add one to the attempt tally and try to re-download assembly
-                else:
-                    attempt +=1
 
 def ATCC_download_manager(download, api_key, dir_out, overwrite):
     """
@@ -568,7 +583,9 @@ def ATCC_download_manager(download, api_key, dir_out, overwrite):
 
         ## Load ATCC genome IDs
         if set(download).intersection({"annotation", "reference", "metadata"}):
-            ids = ATCC_retrieve_ids(api_key=api_key)
+
+            if args['atcc_ids'] == "": ids = ATCC_retrieve_ids(api_key=api_key)
+            if args['atcc_ids'] != "": ids = load_atcc_ids(dir=args['atcc_ids'])
         
         ##________________________________________________________________________
         ## [Download Database] Annotations
@@ -625,13 +642,11 @@ def list_refs_in_download(dir):
     Variables
         - dir   (string)    Path to reference database download directory
     """
-    import os, re
+    import os
     ids = []
     if os.path.exists(dir):
         ## collect names, which will include an underscore with species information
         ids = list_files_in_dir(dir=dir, full_path=False, pattern=".fa.gz", extension=False)
-        ## Clean up ids
-        # ids = [ re.sub("_.+", "", x) for x in ref_names ]
     return(ids)
 
 def list_refs_in_compiled(dir):
@@ -687,13 +702,21 @@ def compile_refs(dir_download, dir_compiled, dir_headers):
         ## Iterate through fa.gz files and merge
         with open(dir_compiled, "w+") as outfile, open(dir_headers, "w+") as out_headers:
             for n,file in enumerate(ref_names_path):
-                if n % 200 == 0: print("\t- References merged: ", n)
+
+                ## Report progress
+                if (n+1) % 200 == 0: print("\t- References merged: ", n)
+
+                ## Iterate fasta file and download to files
                 with gzip.open(file) as infile:
-                    for m,line in enumerate(infile):
-                        outfile.write(line.decode())
-                        if m==0:
+                    for line in infile:
+                        
+                        if line.decode().startswith(">") == True:
                             out_headers.write(line.decode())
-                            # outfile.write(line.decode().replace(' ', ';'))
+                            outfile.write(line.decode().replace(' ', '_'))
+
+                        if line.decode().startswith(">") == False:
+                            outfile.write(line.decode())
+
                 ## If last genome has been reached, do not include a newline at the end of the file.
                 if n!=len(ref_names_path):
                     outfile.write("\n")
@@ -745,8 +768,8 @@ if args['download'] != False :
 
     ## Format downloaded ATCC databases
     ATCC_format_manager(
-        dir_in  = os.path.join(args['out'], "reference"),
-        dir_out = dir_out_downloads )
+        dir_in  = os.path.join(args['out'], "assembly"),
+        dir_out = args['out'] )
 
 
 
