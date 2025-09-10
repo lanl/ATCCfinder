@@ -148,8 +148,6 @@ ATCCfinder/download.py \
 
 
 
-<br /> <br />
-
 **Align & Report a Query Sequence against ATCC References:**
 
 ```
@@ -163,7 +161,21 @@ ATCCfinder/search.R \
 
 
 
+**Create database from existing .fa.gz files:**
 
+```
+ATCCfinder/download.py \
+--format "./db_multifile" \
+--out "./db_singlefile"
+```
+
+*Here, fasta files in folder 'db_multifile' are combined into a single multi-fasta file that is deposited in the folder 'db_singlefile'.*
+
+
+
+
+
+<br /> <br />
 
 # Output <a name="Output"></a>
 
