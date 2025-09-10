@@ -10,28 +10,16 @@ args_rstudio <- function() {
     - Define parameters here if running script from RStudio.
   "
   
-  set <- c("atcc", "staph")[2]
-  
   ## Define Arguments
   if ( set == "atcc" ) {
     args <- list(
-      query         = "/Users/skoehler/Desktop/project_2302_MO/Writing/Publication_ATCCfinder/Journal_Revisions/figures/querying_a_custom_database/data/ncbi_Zymo_MCS_amplicons.fasta",
-      target        = "/Users/skoehler/Desktop/project_2302_MO/Writing/Publication_ATCCfinder/Journal_Revisions/figures/querying_a_custom_database/atcc_downloads/atcc_references.fa",
+      query         = "query.fa",
+      target        = "atcc_downloads/atcc_references.fa",
       target_meta   = "",
       nhits         = "100",
       note_nmatch_p = "95",
       overwrite     = "T",
-      outdir        = "/Users/skoehler/Desktop/project_2302_MO/Writing/Publication_ATCCfinder/Journal_Revisions/figures/querying_a_custom_database/data/output_whitelist" )
-  }
-  if ( set == "staph" ) {
-    args <- list(
-      query         = "/Users/skoehler/Desktop/project_2302_MO/Writing/Publication_ATCCfinder/Journal_Revisions/figures/query_custom_database_Staphylococcus/MH798864.1.fasta",
-      target        = "/Users/skoehler/Desktop/project_2302_MO/Writing/Publication_ATCCfinder/Journal_Revisions/figures/query_custom_database_Staphylococcus/ncbi_genome_Staphylococcus.fa.gz",
-      target_meta   = "/Users/skoehler/Desktop/project_2302_MO/Writing/Publication_ATCCfinder/Journal_Revisions/figures/query_custom_database_Staphylococcus/ncbi_custom_target_database_Staphylococcus.tsv",
-      nhits         = "100",
-      note_nmatch_p = "95",
-      overwrite     = "T",
-      outdir        = "/Users/skoehler/Desktop/project_2302_MO/Writing/Publication_ATCCfinder/Journal_Revisions/figures/query_custom_database_Staphylococcus/output_Staphylococcus" )
+      outdir        = "output" )
   }
   
   ## Format parameters
